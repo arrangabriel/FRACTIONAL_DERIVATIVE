@@ -1,4 +1,5 @@
 from sympy import *
+from manimlib import *
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -103,6 +104,7 @@ def fractional_derivatives(function, variable, lower_derivative, n, interval, np
     function_prime_1_lambda = lambdify(variable, function_prime_1)
     function_prime_2_lambda = lambdify(variable, function_prime_2)
 
+    # calculate points
     points = {
         magnitude + lower_derivative_magnitude: calculate_points(function_lambda,
                                                                  function_prime_1_lambda,
@@ -118,10 +120,10 @@ def main():
     x = Symbol("x")
     function_1 = x ** 3 + 1
     function_2 = sin(x)
-    function_1_points = fractional_derivative_interval(function_1, x, 1.3, [0,3], 50)
-    function_2_points = fractional_derivative_interval(function_2, x, 1.3, [0,3], 50)
+    function_1_points = fractional_derivative_interval(function_1, x, 1.1, [0,3], 50)
+    function_2_points = fractional_derivative_interval(function_2, x, 1.1, [0,3], 50)
     # print(fractional_derivatives(function_1, x, 1, 4, [0,3], 10))
-    #plt.plot(*zip(*sorted(function_1_points.items())))
+    # plt.plot(*zip(*sorted(function_1_points.items())))
     plt.plot(*zip(*sorted(function_2_points.items())))
     plt.show()
 
