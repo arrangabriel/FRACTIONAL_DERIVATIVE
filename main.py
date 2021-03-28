@@ -122,10 +122,37 @@ def main():
     function_2 = sin(x)
     function_1_points = fractional_derivative_interval(function_1, x, 1.1, [0,3], 50)
     function_2_points = fractional_derivative_interval(function_2, x, 1.1, [0,3], 50)
-    # print(fractional_derivatives(function_1, x, 1, 4, [0,3], 10))
-    # plt.plot(*zip(*sorted(function_1_points.items())))
+    #print(fractional_derivatives(function_1, x, 1, 4, [0,3], 10))
+    #plt.plot(*zip(*sorted(function_1_points.items())))
     plt.plot(*zip(*sorted(function_2_points.items())))
     plt.show()
 
 if __name__ == '__main__':
     main()
+
+# this is pretty bad
+class SineExample(Scene):
+    def construct(self):
+        axes = Axes(
+            x_range=(-6, 6),
+            y_range=(-6, 6),
+            height=12,
+            width=12,
+            axis_config={
+                "stroke_color": GREY_A,
+                "stroke_width": 2,
+                "include_tip": False
+            },
+        )
+
+        self.add(axes)
+
+        x = Symbol("x")
+        function = sin(x) + x**2
+        points = fractional_derivative_interval(function, x, 1.3, [-3,3], 300)
+        colors = [RED, GREEN, BLUE, PURPLE]
+
+        for x, y_values in points.items():
+            for i in range(len(y_values)):
+                self.add(Dot(color=colors[i]).move_to(axes.c2p(x, y_values[i])))
+        self.wait()
