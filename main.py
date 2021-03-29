@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 def parse_function(input_string):
     pass
 
-# TODO refactor the multiple derivatives method to an object
+# TODO refactor the multiple derivatives function to an object
 # takes a single derivative of a function
 def derivative(function, variable):
     function_prime = function.diff(variable)
@@ -123,8 +123,7 @@ class Fractional_Derivative:
     def eval_upper_derivative_list(self, x_values: [float]):
         return [self.upper_derivative_lambda(x) for x in x_values]
 
-    @staticmethod
-    def eval_fractional_derivative_list(lower_values: [float], upper_values: [float], magnitude):
+    def eval_fractional_derivative_list(self, lower_values: [float], upper_values: [float], magnitude):
         if magnitude < 0 or magnitude > 1:
             raise Exception("Magnitude must be between o and 1 inclusive.")
         fractional_values = []
@@ -142,16 +141,15 @@ def main():
     x = Symbol("x")
     function = sin(x)
 
-    function_v1_points = fractional_derivative_interval(function, x, 1.1, [0,3], 50)
-
     function_1_instance = Fractional_Derivative(function, x, 1)
     x_values = np.linspace(0, np.pi, 20)
     magnitude = 0.4
-    values = function_1_instance.eval_function_list(x_values)
+
+    function_values = function_1_instance.eval_function_list(x_values)
     lower_derivative_values = function_1_instance.eval_lower_derivative_list(x_values)
     upper_derivative_values = function_1_instance.eval_upper_derivative_list(x_values)
     fractional_derivative_values = function_1_instance.eval_fractional_derivative_list(lower_derivative_values, upper_derivative_values, magnitude)
-    plt.plot(x_values, values, label= function_1_instance.base_function)
+    plt.plot(x_values, function_values, label= function_1_instance.base_function)
     plt.plot(x_values, lower_derivative_values, label= f"{function_1_instance.lower_magnitude} - derivative")
     plt.plot(x_values, upper_derivative_values, label= f"{function_1_instance.lower_magnitude + 1} - derivative")
     plt.plot(x_values, fractional_derivative_values, label= f"{magnitude + function_1_instance.lower_magnitude} - derivative.")
@@ -161,31 +159,45 @@ def main():
 if __name__ == '__main__':
     main()
 
-class graphFromPoints(GraphScene):
-    pass
-# this is pretty bad
+# manim
+class SmoothGraphFromSetPoints(VMobject):
+    def __init__(self, set_of_points, **kwargs):
+        super().__init__(**kwargs)
+        self.set_points_smoothly(set_of_points)
+
 class SineExample(Scene):
     def construct(self):
-        axes = Axes(
-            x_range=(-6, 6),
-            y_range=(-6, 6),
-            height=12,
-            width=12,
-            axis_config={
-                "stroke_color": GREY_A,
-                "stroke_width": 2,
-                "include_tip": False
-            },
-        )
-
-        self.add(axes)
+        axes = Axes((-3,3), (-1,3))
+        axes.add_coordinate_labels()
+        self.play(Write(axes, lag_ratio=0.01, run_time=1))
 
         x = Symbol("x")
-        function = sin(x) + x**2
-        points = fractional_derivative_interval(function, x, 1.3, [-3,3], 300)
-        colors = [RED, GREEN, BLUE, PURPLE]
+        function = sin(x)
 
-        for x, y_values in points.items():
-            for i in range(len(y_values)):
-                self.add(Dot(color=colors[i]).move_to(axes.c2p(x, y_values[i])))
-        self.wait()
+        function_1_instance = Fractional_Derivative(function, x, 1)
+        x_values = np.linspace(-np.pi, np.pi, 20)
+        magnitude = 0.4
+
+        function_values = function_1_instance.eval_function_list(x_values)
+        points_1 = [axes.coords_to_point(x, y) for x, y in [*zip(x_values, function_values)]]
+        graph_1 = SmoothGraphFromSetPoints(points_1, color=ORANGE)
+
+        lower_derivative_values = function_1_instance.eval_lower_derivative_list(x_values)
+        points_2 = [axes.coords_to_point(x, y) for x, y in [*zip(x_values, lower_derivative_values)]]
+        graph_2 = SmoothGraphFromSetPoints(points_2, color=BLUE)
+
+        upper_derivative_values = function_1_instance.eval_upper_derivative_list(x_values)
+        points_3 = [axes.coords_to_point(x, y) for x, y in [*zip(x_values, upper_derivative_values)]]
+        graph_3 = SmoothGraphFromSetPoints(points_3, color=GREEN)
+
+        fractional_derivative_values = function_1_instance.eval_fractional_derivative_list(lower_derivative_values, upper_derivative_values, magnitude)
+        points_4 = [axes.coords_to_point(x, y) for x, y in [*zip(x_values, fractional_derivative_values)]]
+        graph_4 = SmoothGraphFromSetPoints(points_4, color=RED)
+
+        self.play(ShowCreation(graph_1, run_time=2))
+        self.wait(0.5)
+        self.play(ShowCreation(graph_2, run_time=2))
+        self.wait(0.5)
+        self.play(ShowCreation(graph_3, run_time=2))
+        self.wait(0.5)
+        self.play(ShowCreation(graph_4, run_time=2))
