@@ -4,9 +4,23 @@ from manimlib import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-# TODO create input parser using sympy
-def parse_function(input_string):
-    pass
+# primitive input parser
+def parse_function(input_string, input_variable):
+    variable, expression = None, None
+    while true:
+        try:
+            variable = Symbol(input_variable.split()[0])
+        except ValueError or TypeError:
+            print("Some issue with input.")
+            continue
+        break
+    while true:
+        try:
+            expression = parse_expr(input_string, evaluate= true)
+        except ValueError or TypeError:
+            print("Some issue with input.")
+            continue
+        return expression, variable
 
 # differentiate upper and lower bounds
 def endpoint_derivatives(function, lower_derivative_magnitude, variable):
@@ -17,6 +31,7 @@ def endpoint_derivatives(function, lower_derivative_magnitude, variable):
         function_2 = function_2.diff(variable)
     return function_1, function_2
 
+# function wrapper
 class Fractional_Derivative:
     def __init__(self, function, variable, lower_derivative_magnitude: int):
         if lower_derivative_magnitude < 0:
@@ -124,10 +139,10 @@ class Fractional_Derivative:
         return points
 
 def main():
-    x = Symbol("x")
-    function = sin(x)
+    function = input("Function expression: ")
+    variable = input("Variable: ")
 
-    function_1_instance = Fractional_Derivative(function, x, 1)
+    function_1_instance = Fractional_Derivative(*parse_function(function, variable), 1)
     x_values = np.linspace(0, np.pi, 20)
     magnitude = 0.4
 
@@ -146,6 +161,7 @@ if __name__ == '__main__':
     main()
 
 # manim section
+
 class SmoothGraphFromSetPoints(VMobject):
     def __init__(self, set_of_points, **kwargs):
         super().__init__(**kwargs)
