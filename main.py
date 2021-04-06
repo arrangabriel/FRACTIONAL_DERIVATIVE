@@ -16,7 +16,7 @@ def parse_function(input_string, input_variable):
         break
     while true:
         try:
-            expression = parse_expr(input_string, evaluate= true)
+            expression = parse_expr(input_string, evaluate=true)
         except ValueError or TypeError:
             print("Some issue with input.")
             continue
@@ -161,7 +161,6 @@ if __name__ == '__main__':
     main()
 
 # manim section
-
 class SmoothGraphFromSetPoints(VMobject):
     def __init__(self, set_of_points, **kwargs):
         super().__init__(**kwargs)
@@ -194,8 +193,42 @@ class SineExample(Scene):
 
         self.play(ShowCreation(graph_1, run_time=2))
         self.wait(0.5)
-        self.play(ShowCreation(graph_2, run_time=2))
+        self.play(TransformFromCopy(graph_1, graph_2, run_time=2))
         self.wait(0.5)
-        self.play(ShowCreation(graph_3, run_time=2))
+        self.play(TransformFromCopy(graph_1, graph_3, run_time=2))
         self.wait(0.5)
-        self.play(ShowCreation(graph_4, run_time=2))
+        self.play(Transform(graph_1, graph_4, run_time=2))
+
+class SineExample2(Scene):
+    def construct(self):
+        axes = Axes((-3,3), (-3,3))
+        axes.add_coordinate_labels()
+        self.play(Write(axes, lag_ratio=0.01, run_time=1))
+
+        x = Symbol("x")
+        function = sin(x)
+
+        function_1_instance = Fractional_Derivative(function, x, 1)
+        x_values = np.linspace(-3, 3, 10)
+        magnitude = 0.4
+
+        points_1 = [axes.coords_to_point(x, y) for x, y in function_1_instance.eval_function_points(x_values)]
+        graph_1 = SmoothGraphFromSetPoints(points_1, color=ORANGE)
+
+        points_2 = [axes.coords_to_point(x, y) for x, y in function_1_instance.eval_lower_derivative_points(x_values)]
+        graph_2 = SmoothGraphFromSetPoints(points_2, color=BLUE)
+
+        points_3 = [axes.coords_to_point(x, y) for x, y in function_1_instance.eval_upper_derivative_points(x_values)]
+        graph_3 = SmoothGraphFromSetPoints(points_3, color=GREEN)
+
+        # TODO: make 'continous'
+        points_4 = [axes.coords_to_point(x, y) for x, y in function_1_instance.eval_fractional_derivative_points(x_values, magnitude)]
+        graph_4 = SmoothGraphFromSetPoints(points_4, color=RED)
+
+        self.play(ShowCreation(graph_1, run_time=2))
+        self.wait(0.5)
+        self.play(TransformFromCopy(graph_1, graph_2, run_time=2))
+        self.wait(0.5)
+        self.play(TransformFromCopy(graph_1, graph_3, run_time=2))
+        self.wait(0.5)
+        self.play(Transform(graph_1, graph_4, run_time=2))
