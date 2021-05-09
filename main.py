@@ -1,8 +1,9 @@
-from manim import *
+# from manim import *
 from sympy import *
 from manimlib import *
 import numpy as np
 import matplotlib.pyplot as plt
+
 
 # primitive input parser
 def parse_function(input_string, input_variable):
@@ -22,6 +23,7 @@ def parse_function(input_string, input_variable):
             continue
         return expression, variable
 
+
 # differentiate upper and lower bounds
 def endpoint_derivatives(function, lower_derivative_magnitude, variable):
     function_1, function_2 = function, function
@@ -31,8 +33,9 @@ def endpoint_derivatives(function, lower_derivative_magnitude, variable):
         function_2 = function_2.diff(variable)
     return function_1, function_2
 
+
 # function wrapper
-class Fractional_Derivative:
+class FractionalDerivative:
     def __init__(self, function, variable, lower_derivative_magnitude: int):
         if lower_derivative_magnitude < 0:
             raise Exception("Cannot take negative derivative. Try an integral or something.")
@@ -138,11 +141,12 @@ class Fractional_Derivative:
         }
         return points
 
+
 def main():
     function = input("Function expression: ")
     variable = input("Variable: ")
 
-    function_1_instance = Fractional_Derivative(*parse_function(function, variable), 1)
+    function_1_instance = FractionalDerivative(*parse_function(function, variable), 1)
     x_values = np.linspace(0, np.pi, 20)
     magnitude = 0.4
 
@@ -157,14 +161,17 @@ def main():
     plt.legend(loc= "lower right")
     plt.show()
 
+
 if __name__ == '__main__':
     main()
+
 
 # manim section
 class SmoothGraphFromSetPoints(VMobject):
     def __init__(self, set_of_points, **kwargs):
         super().__init__(**kwargs)
         self.set_points_smoothly(set_of_points)
+
 
 class SineExample(Scene):
     def construct(self):
@@ -173,9 +180,9 @@ class SineExample(Scene):
         self.play(Write(axes, lag_ratio=0.01, run_time=1))
 
         x = Symbol("x")
-        function = sin(x)
+        function = sin(x) - x**2
 
-        function_1_instance = Fractional_Derivative(function, x, 1)
+        function_1_instance = FractionalDerivative(function, x, 1)
         x_values = np.linspace(-3, 3, 10)
         magnitude = 0.4
 
@@ -199,16 +206,17 @@ class SineExample(Scene):
         self.wait(0.5)
         self.play(Transform(graph_1, graph_4, run_time=2))
 
-class SineExample2(Scene):
+
+class PolyExample(Scene):
     def construct(self):
         axes = Axes((-3,3), (-3,3))
         axes.add_coordinate_labels()
         self.play(Write(axes, lag_ratio=0.01, run_time=1))
 
         x = Symbol("x")
-        function = sin(x)
+        function = x**3
 
-        function_1_instance = Fractional_Derivative(function, x, 1)
+        function_1_instance = FractionalDerivative(function, x, 1)
         x_values = np.linspace(-3, 3, 10)
         magnitude = 0.4
 
